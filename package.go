@@ -271,6 +271,62 @@ func (m *PackageFileCache) processImportStatement(s string) {
 }
 
 func (m *PackageFileCache) expandPackages(s []byte) []byte {
+
+	out := bytes.NewBuffer(make([]byte, 0, len(s)))
+	start := -1
+	var last = 0
+	for i, _ := range s {
+		if s[i] == '"' {
+			if s[i-1] == '\\' {
+				continue
+			}
+
+			if start >= 0 {
+				name := s[start+1 : i]
+
+				if s[start-1] == ':' {
+					out.Write(s[last : start-1])
+					out.Write(s[start:i])
+					last = i
+					start = -1
+					continue
+				}
+
+				out.Write(s[last:start])
+
+				if s[start-2] == ';' || s[start-2] == '{' {
+					last = i + 2
+					start = -1
+					continue
+
+				}
+				if len(name) > 0 {
+					if n, ok := m.pathToAlias[string(name)]; ok {
+						name = []byte(n)
+					} else {
+						name = s[start : i+1]
+					}
+
+				} else {
+					name = []byte(m.defalias)
+				}
+				out.Write(name)
+				last = i + 1
+				start = -1
+
+			} else {
+				start = i
+			}
+
+		}
+	}
+	out.Write(s[last:])
+	return out.Bytes()
+
+}
+
+/*
+func (m *PackageFileCache) expandPackages(s []byte) []byte {
 	out := bytes.NewBuffer(make([]byte, 0, len(s)))
 	i := 0
 	for {
@@ -319,7 +375,7 @@ func (m *PackageFileCache) expandPackages(s []byte) []byte {
 	}
 	panic("unreachable")
 }
-
+*/
 func (m *PackageFileCache) addPackageToScope(alias, realname string) {
 	d := NewDecl(realname, DECL_PACKAGE, nil)
 	m.scope.addDecl(alias, d)
