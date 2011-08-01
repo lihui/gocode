@@ -1,8 +1,10 @@
-Found 51 candidates:
+Found 55 candidates:
   func Addr() reflect.Value
   func Bool() bool
   func Call(in []reflect.Value) []reflect.Value
+  func CallSlice(in []reflect.Value) []reflect.Value
   func CanAddr() bool
+  func CanInterface() bool
   func CanSet() bool
   func Cap() int
   func Close()
@@ -24,6 +26,7 @@ Found 51 candidates:
   func MapIndex(key reflect.Value) reflect.Value
   func MapKeys() []reflect.Value
   func Method(i int) reflect.Value
+  func MethodByName(name string) reflect.Value
   func NumField() int
   func OverflowComplex(x complex128) bool
   func OverflowFloat(x float64) bool
@@ -49,4 +52,5 @@ Found 51 candidates:
   func Type() reflect.Type
   func Uint() uint64
   func UnsafeAddr() uintptr
-  var Internal reflect.valueInterface
+  var Internal interface{}
+  var InternalMethod int
